@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For Kavya — A Letter I Never Sent</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Dancing+Script:wght@400;600;700&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ivory: #f5f0e8;
+    --beige: #e8dfd0;
+    --parchment: #d4c5a9;
+    --muted-rose: #c4917a;
+    --dusty-rose: #b07a6e;
+    --deep-rose: #8b5a52;
+    --charcoal: #1a1614;
+    --dark-brown: #2d1f1a;
+    --warm-black: #0d0a09;
+    --ink: #211a16;
+    --fog: rgba(245,240,232,0.06);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--warm-black);
+    color: var(--ivory);
+    font-family: 'Cormorant Garamond', serif;
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+  /* ── RAIN CANVAS ── */
+  #rain-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.18;
+  }
+
+  /* ── PETALS CANVAS ── */
+  #petals-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 2;
+    opacity: 0.55;
+  }
+
+  /* ── GLOBAL OVERLAY ── */
+  .grain-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E");
+    opacity: 0.55;
+    mix-blend-mode: overlay;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 1.5rem 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(to bottom, rgba(13,10,9,0.9), transparent);
+  }
+
+  .nav-brand {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.4rem;
+    color: var(--muted-rose);
+    letter-spacing: 0.04em;
+    opacity: 0.85;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 2.5rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.78rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--parchment);
+    text-decoration: none;
+    opacity: 0.6;
+    transition: opacity 0.4s, color 0.4s;
+  }
+
+  .nav-links a:hover { opacity: 1; color: var(--muted-rose); }
+
+  /* ── HERO ── */
+  #hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 6rem 2rem 4rem;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 30%, rgba(139,90,82,0.12) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 80% at 20% 70%, rgba(196,145,122,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 20%, rgba(180,120,100,0.05) 0%, transparent 55%),
+      linear-gradient(180deg, #0a0806 0%, #110d0b 40%, #0d0a08 100%);
+    z-index: 0;
+  }
+
+  .hero-light {
+    position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(196,145,122,0.07) 0%, transparent 70%);
+    border-radius: 50%;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -60%);
+    animation: breathe 6s ease-in-out infinite;
+    z-index: 0;
+    filter: blur(40px);
+  }
+
+  @keyframes breathe {
+    0%, 100% { transform: translate(-50%,-60%) scale(1); opacity: 0.7; }
+    50% { transform: translate(-50%,-60%) scale(1.15); opacity: 1; }
+  }
+
+  .hero-content { position: relative; z-index: 5; }
+
+  .hero-prelude {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.1rem;
+    color: var(--muted-rose);
+    opacity: 0;
+    animation: fadeUp 1.4s ease 0.5s forwards;
+    letter-spacing: 0.06em;
+    margin-bottom: 1.2rem;
+  }
+
+  .hero-name {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(5rem, 14vw, 11rem);
+    font-weight: 400;
+    font-style: italic;
+    color: var(--ivory);
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    opacity: 0;
+    animation: fadeUp 1.6s ease 0.9s forwards;
+    text-shadow: 0 0 120px rgba(196,145,122,0.15);
+  }
+
+  .hero-subtitle {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: clamp(1rem, 2.5vw, 1.4rem);
+    color: var(--parchment);
+    opacity: 0;
+    animation: fadeUp 1.6s ease 1.5s forwards;
+    margin-top: 1.8rem;
+    letter-spacing: 0.04em;
+    max-width: 520px;
+    line-height: 1.8;
+  }
+
+  .hero-divider {
+    width: 1px;
+    height: 80px;
+    background: linear-gradient(to bottom, transparent, var(--muted-rose), transparent);
+    margin: 3rem auto 0;
+    opacity: 0;
+    animation: fadeIn 2s ease 2.2s forwards;
+  }
+
+  .scroll-hint {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--parchment);
+    opacity: 0;
+    animation: fadeIn 2s ease 2.8s forwards;
+    margin-top: 1.2rem;
+  }
+
+  /* ── SECTION BASE ── */
+  section {
+    position: relative;
+    z-index: 10;
+    padding: 8rem 2rem;
+  }
+
+  .section-inner {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .section-number {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--muted-rose);
+    opacity: 0.6;
+    margin-bottom: 0.8rem;
+    display: block;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: clamp(2.4rem, 6vw, 4rem);
+    font-weight: 400;
+    color: var(--ivory);
+    line-height: 1.15;
+    margin-bottom: 3rem;
+  }
+
+  .section-title em {
+    color: var(--muted-rose);
+    font-style: normal;
+  }
+
+  /* ── PAPER TEXTURE ── */
+  .paper-block {
+    background:
+      linear-gradient(135deg, rgba(245,240,232,0.04) 0%, rgba(212,197,169,0.02) 100%);
+    border: 1px solid rgba(196,145,122,0.12);
+    border-radius: 2px;
+    padding: 3rem 3.5rem;
+    position: relative;
+    margin-bottom: 2rem;
+  }
+
+  .paper-block::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: linear-gradient(to bottom, transparent, var(--muted-rose), transparent);
+    opacity: 0.4;
+  }
+
+  .paper-block p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.1rem, 2vw, 1.3rem);
+    line-height: 2;
+    color: var(--beige);
+    font-weight: 300;
+  }
+
+  /* ── SORRY SECTION ── */
+  #sorry {
+    background: linear-gradient(180deg, var(--warm-black) 0%, #100c0a 50%, var(--warm-black) 100%);
+  }
+
+  .sorry-letter {
+    font-family: 'Dancing Script', cursive;
+    font-size: clamp(1.3rem, 3vw, 1.7rem);
+    line-height: 2.1;
+    color: var(--ivory);
+    opacity: 0.88;
+  }
+
+  .sorry-highlight {
+    color: var(--muted-rose);
+    font-style: italic;
+  }
+
+  /* ── UNSAID SECTION ── */
+  #unsaid {
+    background: linear-gradient(180deg, var(--warm-black) 0%, #0e0b09 100%);
+  }
+
+  .unsaid-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-top: 1rem;
+  }
+
+  .unsaid-card {
+    background: linear-gradient(135deg, rgba(196,145,122,0.06), rgba(139,90,82,0.03));
+    border: 1px solid rgba(196,145,122,0.1);
+    padding: 2rem 2rem;
+    border-radius: 2px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.4s, background 0.4s;
+  }
+
+  .unsaid-card:hover {
+    border-color: rgba(196,145,122,0.25);
+    background: linear-gradient(135deg, rgba(196,145,122,0.1), rgba(139,90,82,0.06));
+  }
+
+  .unsaid-card::after {
+    content: '"';
+    position: absolute;
+    top: -0.5rem; left: 0.8rem;
+    font-family: 'Playfair Display', serif;
+    font-size: 6rem;
+    color: var(--muted-rose);
+    opacity: 0.08;
+    line-height: 1;
+  }
+
+  .unsaid-card p {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 1.05rem;
+    line-height: 1.9;
+    color: var(--beige);
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── MEMORIES SECTION ── */
+  #memories {
+    background: linear-gradient(180deg, var(--warm-black) 0%, #120e0b 60%, var(--warm-black) 100%);
+  }
+
+  .memory-timeline {
+    position: relative;
+    padding-left: 2.5rem;
+  }
+
+  .memory-timeline::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 1px;
+    background: linear-gradient(to bottom, transparent, rgba(196,145,122,0.3), rgba(196,145,122,0.15), transparent);
+  }
+
+  .memory-item {
+    position: relative;
+    padding: 2rem 0 3rem 2rem;
+    opacity: 0.85;
+    transition: opacity 0.3s;
+  }
+
+  .memory-item:hover { opacity: 1; }
+
+  .memory-item::before {
+    content: '';
+    position: absolute;
+    left: -4px; top: 2.4rem;
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    background: var(--muted-rose);
+    box-shadow: 0 0 12px rgba(196,145,122,0.4);
+  }
+
+  .memory-label {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1rem;
+    color: var(--muted-rose);
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+
+  .memory-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.05rem, 2vw, 1.25rem);
+    line-height: 1.9;
+    color: var(--beige);
+    font-weight: 300;
+  }
+
+  /* ── REGRETS SECTION ── */
+  #regrets {
+    background: linear-gradient(180deg, var(--warm-black) 0%, #0a0806 100%);
+    text-align: center;
+  }
+
+  .regret-quote-wrap {
+    position: relative;
+    margin: 4rem 0;
+  }
+
+  .regret-quote {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: clamp(1.3rem, 3.5vw, 2rem);
+    line-height: 1.7;
+    color: var(--ivory);
+    max-width: 680px;
+    margin: 0 auto;
+    opacity: 0.9;
+  }
+
+  .regret-quote span {
+    color: var(--muted-rose);
+  }
+
+  .regrets-list {
+    list-style: none;
+    margin: 3rem auto;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+  }
+
+  .regrets-list li {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 1.05rem;
+    color: var(--parchment);
+    padding: 1.2rem 2rem;
+    border-bottom: 1px solid rgba(196,145,122,0.1);
+    position: relative;
+    opacity: 0.8;
+    transition: opacity 0.3s, color 0.3s;
+  }
+
+  .regrets-list li:hover { opacity: 1; color: var(--muted-rose); }
+
+  /* ── FIX EVERYTHING SECTION ── */
+  #fix {
+    background: linear-gradient(180deg, var(--warm-black) 0%, #110d0b 50%, #0a0806 100%);
+  }
+
+  .fix-promise {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .promise-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid rgba(196,145,122,0.08);
+  }
+
+  .promise-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    font-style: italic;
+    color: var(--muted-rose);
+    opacity: 0.4;
+    min-width: 2.5rem;
+    line-height: 1;
+    padding-top: 0.2rem;
+  }
+
+  .promise-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.05rem, 2vw, 1.22rem);
+    line-height: 1.9;
+    color: var(--beige);
+    font-weight: 300;
+  }
+
+  /* ── CLOSING ── */
+  #closing {
+    min-height: 70vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: linear-gradient(180deg, #0a0806 0%, var(--warm-black) 100%);
+    padding: 6rem 2rem;
+  }
+
+  .closing-sign {
+    font-family: 'Dancing Script', cursive;
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    color: var(--parchment);
+    opacity: 0.5;
+    letter-spacing: 0.12em;
+    margin-bottom: 1.5rem;
+  }
+
+  .closing-name {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: clamp(3rem, 8vw, 6rem);
+    color: var(--ivory);
+    font-weight: 400;
+    text-shadow: 0 0 80px rgba(196,145,122,0.12);
+  }
+
+  .closing-footnote {
+    margin-top: 2.5rem;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1rem;
+    color: var(--parchment);
+    opacity: 0.45;
+    max-width: 420px;
+    line-height: 1.9;
+  }
+
+  .closing-rose {
+    font-size: 1.5rem;
+    margin-top: 2rem;
+    opacity: 0.35;
+    animation: float 4s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  /* ── LARGE QUOTE BREAK ── */
+  .cinematic-quote {
+    text-align: center;
+    padding: 6rem 2rem;
+    background: linear-gradient(180deg, var(--warm-black) 0%, #0e0a08 50%, var(--warm-black) 100%);
+    position: relative;
+    z-index: 10;
+  }
+
+  .cinematic-quote blockquote {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: clamp(1.4rem, 3.5vw, 2.2rem);
+    color: var(--ivory);
+    max-width: 700px;
+    margin: 0 auto;
+    line-height: 1.65;
+    opacity: 0.88;
+    position: relative;
+  }
+
+  .cinematic-quote blockquote::before,
+  .cinematic-quote blockquote::after {
+    content: '—';
+    display: block;
+    width: 40px;
+    height: 1px;
+    background: rgba(196,145,122,0.35);
+    margin: 1.5rem auto;
+  }
+
+  .cinematic-quote cite {
+    display: block;
+    margin-top: 1.5rem;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: normal;
+    font-size: 0.78rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--muted-rose);
+    opacity: 0.6;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.9s ease, transform 0.9s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.25s; }
+  .reveal-delay-3 { transition-delay: 0.4s; }
+  .reveal-delay-4 { transition-delay: 0.55s; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 680px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    .unsaid-grid { grid-template-columns: 1fr; }
+    .paper-block { padding: 2rem 1.8rem; }
+    section { padding: 5rem 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="rain-canvas"></canvas>
+<canvas id="petals-canvas"></canvas>
+<div class="grain-overlay"></div>
+
+<!-- NAV -->
+<nav>
+  <span class="nav-brand">for Kavya</span>
+  <ul class="nav-links">
+    <li><a href="#sorry">Sorry</a></li>
+    <li><a href="#unsaid">Unsaid</a></li>
+    <li><a href="#memories">Memories</a></li>
+    <li><a href="#regrets">Regrets</a></li>
+    <li><a href="#fix">Promise</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-light"></div>
+  <div class="hero-content">
+    <p class="hero-prelude">a letter written in the rain, for</p>
+    <h1 class="hero-name">Kavya</h1>
+    <p class="hero-subtitle">Some doors, once closed, echo forever.<br>This is me standing at yours, in the rain, hoping you still hear me.</p>
+    <div class="hero-divider"></div>
+    <p class="scroll-hint">read slowly</p>
+  </div>
+</section>
+
+<!-- CINEMATIC QUOTE 1 -->
+<div class="cinematic-quote">
+  <blockquote>
+    "Some mistakes only teach you the value of a person after losing them."
+    <cite>— what I learned, too late</cite>
+  </blockquote>
+</div>
+
+<!-- SORRY -->
+<section id="sorry">
+  <div class="section-inner">
+    <span class="section-number reveal">I.</span>
+    <h2 class="section-title reveal reveal-delay-1">I'm <em>Sorry</em></h2>
+
+    <div class="paper-block reveal reveal-delay-2">
+      <p class="sorry-letter">
+        Kavya,<br><br>
+        I've started this letter a hundred times. Crumpled it. Burned it. Started again.
+        Because <span class="sorry-highlight">some apologies don't know how to exist in words</span> —
+        they live in the silence between breaths, in the moment you reach for someone who's no longer there.<br><br>
+        I'm sorry. Not the kind you say to fill a silence. The kind that keeps you awake
+        at 3 a.m. when the rain won't stop and every song sounds like your name.
+      </p>
+    </div>
+
+    <div class="paper-block reveal reveal-delay-3">
+      <p class="sorry-letter">
+        I'm sorry for the times I made you feel small when you were the tallest thing in my life.
+        For the words I chose when I should have chosen silence.
+        For the silences I chose when I should have spoken.
+        For <span class="sorry-highlight">every moment I made you question your worth</span>
+        when you were everything that made mine real.
+      </p>
+    </div>
+
+    <div class="paper-block reveal reveal-delay-4">
+      <p class="sorry-letter">
+        I'm sorry for the version of me you had to meet.
+        The careless one. The one who didn't know how to hold something precious without flinching.
+        <span class="sorry-highlight">You deserved better</span> — not a better version of me, a different kind of care entirely.
+        And yet, you stayed longer than you should have, and even that I took for granted.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- CINEMATIC QUOTE 2 -->
+<div class="cinematic-quote">
+  <blockquote>
+    "I didn't lose you in one moment. I lost you in every small moment I stopped choosing you."
+    <cite>— the truth I carry</cite>
+  </blockquote>
+</div>
+
+<!-- UNSAID -->
+<section id="unsaid">
+  <div class="section-inner">
+    <span class="section-number reveal">II.</span>
+    <h2 class="section-title reveal reveal-delay-1">Things I Couldn't <em>Say</em></h2>
+    <div class="unsaid-grid">
+      <div class="unsaid-card reveal reveal-delay-1">
+        <p>I wanted to say "don't go" every single time you walked out that door. I just didn't know how to say it without it sounding like I was asking you to stay for me instead of yourself.</p>
+      </div>
+      <div class="unsaid-card reveal reveal-delay-2">
+        <p>I was scared that if I told you how much you meant to me, you'd realize how much power you had — and I was afraid of needing someone that completely.</p>
+      </div>
+      <div class="unsaid-card reveal reveal-delay-1">
+        <p>There were moments I wanted to hold your hand and say "I see you." Not the version you showed the world. The real one. The one only I ever noticed.</p>
+      </div>
+      <div class="unsaid-card reveal reveal-delay-2">
+        <p>You were right. About everything you ever quietly suspected. I just never had the courage to confirm it, because confirmation would have meant reckoning — and I wasn't ready to reckon.</p>
+      </div>
+      <div class="unsaid-card reveal reveal-delay-1">
+        <p>I missed you even when you were right there. That was the cruelest part — missing someone who was still present, because you knew you were slowly making them leave.</p>
+      </div>
+      <div class="unsaid-card reveal reveal-delay-2">
+        <p>"I love you" felt too small. So I said nothing. That was worse. The grandest mistake I've ever made — choosing inadequate silence over imperfect words.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MEMORIES -->
+<section id="memories">
+  <div class="section-inner">
+    <span class="section-number reveal">III.</span>
+    <h2 class="section-title reveal reveal-delay-1">Memories <em>With You</em></h2>
+
+    <div class="memory-timeline">
+      <div class="memory-item reveal">
+        <span class="memory-label">the beginning</span>
+        <p class="memory-text">I remember the first time you laughed around me — really laughed, the kind that caught you off guard. I thought: this is the sound I want to protect. I didn't protect it nearly well enough.</p>
+      </div>
+      <div class="memory-item reveal reveal-delay-1">
+        <span class="memory-label">rainy evenings</span>
+        <p class="memory-text">Those evenings when the world felt like it existed only inside our conversation. The rain outside, the soft light, you talking about something you cared about — I was only half listening. I'd give anything to go back and listen completely.</p>
+      </div>
+      <div class="memory-item reveal reveal-delay-2">
+        <span class="memory-label">the quiet moments</span>
+        <p class="memory-text">The silences we shared that didn't need filling. That was rare, Kavya. That kind of ease is something most people search for their whole lives and never find. I had it and called it ordinary.</p>
+      </div>
+      <div class="memory-item reveal reveal-delay-3">
+        <span class="memory-label">your eyes when you were hurt</span>
+        <p class="memory-text">I knew the exact look. The way your eyes would go quiet before the rest of you followed. I caused that look more times than I can forgive myself for. It haunts me — not dramatically, but softly, constantly, like a song stuck between notes.</p>
+      </div>
+      <div class="memory-item reveal reveal-delay-4">
+        <span class="memory-label">the last time</span>
+        <p class="memory-text">I didn't know it was the last time. I wish I had. I would have held on longer. Said more. Let you know that even in my worst moments, the best thing about my life was you — and I never once said it clearly enough.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CINEMATIC QUOTE 3 -->
+<div class="cinematic-quote">
+  <blockquote>
+    "You were the warmth I walked away from, standing in cold rooms wondering why I was always cold."
+    <cite>— the irony I live with</cite>
+  </blockquote>
+</div>
+
+<!-- REGRETS -->
+<section id="regrets">
+  <div class="section-inner" style="text-align:center;">
+    <span class="section-number reveal" style="display:block; text-align:center;">IV.</span>
+    <h2 class="section-title reveal reveal-delay-1">Late Night <em>Regrets</em></h2>
+
+    <div class="regret-quote-wrap reveal reveal-delay-2">
+      <p class="regret-quote">The night feels longer when the person you want to call is the same person you hurt. So you just sit with it — the weight of what you did and what you didn't do.</p>
+    </div>
+
+    <ul class="regrets-list">
+      <li class="reveal reveal-delay-1">For every time I replied with silence when you needed words.</li>
+      <li class="reveal reveal-delay-2">For making you feel like too much, when you were always exactly enough.</li>
+      <li class="reveal reveal-delay-2">For the arguments that didn't need to happen if I had just paused.</li>
+      <li class="reveal reveal-delay-3">For letting pride win when I should have let you win instead.</li>
+      <li class="reveal reveal-delay-3">For the nights you cried that I don't know about — because I wasn't there to ask.</li>
+      <li class="reveal reveal-delay-4">For not being the person you believed I could be, when you were already that person for me.</li>
+      <li class="reveal reveal-delay-4">For the version of us that existed only in the moments I wasn't ruining it.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- FIX EVERYTHING -->
+<section id="fix">
+  <div class="section-inner">
+    <span class="section-number reveal">V.</span>
+    <h2 class="section-title reveal reveal-delay-1">If I Could <em>Fix Everything</em></h2>
+
+    <div class="paper-block reveal reveal-delay-2" style="margin-bottom:2.5rem;">
+      <p style="font-family:'Cormorant Garamond',serif; font-size:1.15rem; line-height:2; color:var(--beige); font-weight:300; font-style:italic;">
+        I know I can't rewrite what happened. But if the universe handed me a single, quiet moment to redo everything — here is what I would do differently:
+      </p>
+    </div>
+
+    <div class="fix-promise">
+      <div class="promise-item reveal reveal-delay-1">
+        <span class="promise-number">1</span>
+        <p class="promise-text">I would listen — not to respond, but to truly understand the things you were too gentle to say loudly. I would sit in the discomfort of your pain instead of trying to make it smaller so I could feel less guilty.</p>
+      </div>
+      <div class="promise-item reveal reveal-delay-2">
+        <span class="promise-number">2</span>
+        <p class="promise-text">I would choose you. Consciously, daily, loudly. Not just in the big moments but in the small ones — the ones you think no one notices. I would notice them all.</p>
+      </div>
+      <div class="promise-item reveal reveal-delay-3">
+        <span class="promise-number">3</span>
+        <p class="promise-text">I would say the things that lived in my chest without ever making it to my mouth. You deserved to hear them. Loving someone in silence and calling it protection is just another kind of cowardice.</p>
+      </div>
+      <div class="promise-item reveal reveal-delay-4">
+        <span class="promise-number">4</span>
+        <p class="promise-text">I would be softer. Not weaker — softer. There's a difference I only learned from losing you. Softness is the bravest thing, and I was too afraid to be brave when it mattered most.</p>
+      </div>
+      <div class="promise-item reveal">
+        <span class="promise-number">5</span>
+        <p class="promise-text">I would simply tell you, plainly, without poetry or delay: You mattered. You matter still. Not in a past-tense way. In every present moment, in every quiet room, in every song that somehow sounds like the last conversation we never had.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CLOSING -->
+<section id="closing">
+  <p class="closing-sign reveal">with everything I should have said sooner —</p>
+  <h2 class="closing-name reveal reveal-delay-1">Kavya.</h2>
+  <p class="closing-footnote reveal reveal-delay-2">
+    This isn't a goodbye letter. It isn't a plea. It's just the truth, finally sitting still long enough to be written. Whatever you choose to do with it — I hope you choose yourself first. You always deserved that the most.
+  </p>
+  <div class="closing-rose reveal reveal-delay-3">🌹</div>
+</section>
+
+<script>
+// ── RAIN ──
+(function() {
+  const canvas = document.getElementById('rain-canvas');
+  const ctx = canvas.getContext('2d');
+  let drops = [];
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    drops = [];
+    for (let i = 0; i < 140; i++) {
+      drops.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        len: Math.random() * 22 + 10,
+        speed: Math.random() * 2.5 + 1.2,
+        opacity: Math.random() * 0.35 + 0.08,
+        width: Math.random() * 0.6 + 0.2
+      });
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drops.forEach(d => {
+      ctx.beginPath();
+      ctx.moveTo(d.x, d.y);
+      ctx.lineTo(d.x + d.len * 0.18, d.y + d.len);
+      ctx.strokeStyle = `rgba(200,185,165,${d.opacity})`;
+      ctx.lineWidth = d.width;
+      ctx.stroke();
+      d.y += d.speed;
+      d.x += d.speed * 0.18;
+      if (d.y > canvas.height) {
+        d.y = -d.len;
+        d.x = Math.random() * canvas.width;
+      }
+    });
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', resize);
+  resize();
+  draw();
+})();
+
+// ── PETALS ──
+(function() {
+  const canvas = document.getElementById('petals-canvas');
+  const ctx = canvas.getContext('2d');
+  let petals = [];
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    if (petals.length === 0) {
+      for (let i = 0; i < 22; i++) spawnPetal();
+    }
+  }
+
+  function spawnPetal() {
+    petals.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height - canvas.height,
+      size: Math.random() * 8 + 4,
+      speedY: Math.random() * 0.6 + 0.2,
+      speedX: (Math.random() - 0.5) * 0.5,
+      rotation: Math.random() * Math.PI * 2,
+      rotSpeed: (Math.random() - 0.5) * 0.018,
+      opacity: Math.random() * 0.4 + 0.15,
+      sway: Math.random() * Math.PI * 2,
+      swaySpeed: Math.random() * 0.012 + 0.005,
+      swayAmp: Math.random() * 1.2 + 0.4
+    });
+  }
+
+  function drawPetal(p) {
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.rotation);
+    ctx.globalAlpha = p.opacity;
+    ctx.beginPath();
+    ctx.ellipse(0, 0, p.size * 0.55, p.size, 0, 0, Math.PI * 2);
+    const grad = ctx.createRadialGradient(0, -p.size * 0.3, 0, 0, 0, p.size);
+    grad.addColorStop(0, 'rgba(220,170,155,1)');
+    grad.addColorStop(0.6, 'rgba(196,145,122,0.8)');
+    grad.addColorStop(1, 'rgba(160,100,90,0.3)');
+    ctx.fillStyle = grad;
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    petals.forEach((p, i) => {
+      p.sway += p.swaySpeed;
+      p.x += p.speedX + Math.sin(p.sway) * p.swayAmp;
+      p.y += p.speedY;
+      p.rotation += p.rotSpeed;
+      if (p.y > canvas.height + 20) {
+        petals[i] = {
+          x: Math.random() * canvas.width,
+          y: -20,
+          size: Math.random() * 8 + 4,
+          speedY: Math.random() * 0.6 + 0.2,
+          speedX: (Math.random() - 0.5) * 0.5,
+          rotation: Math.random() * Math.PI * 2,
+          rotSpeed: (Math.random() - 0.5) * 0.018,
+          opacity: Math.random() * 0.4 + 0.15,
+          sway: Math.random() * Math.PI * 2,
+          swaySpeed: Math.random() * 0.012 + 0.005,
+          swayAmp: Math.random() * 1.2 + 0.4
+        };
+      }
+      drawPetal(p);
+    });
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', resize);
+  resize();
+  draw();
+})();
+
+// ── SCROLL REVEAL ──
+(function() {
+  const els = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  els.forEach(el => observer.observe(el));
+})();
+</script>
+</body>
+</html>
